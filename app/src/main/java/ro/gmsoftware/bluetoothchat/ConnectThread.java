@@ -2,6 +2,7 @@ package ro.gmsoftware.bluetoothchat;
 
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.os.Handler;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -15,12 +16,14 @@ public class ConnectThread extends Thread {
     private final BluetoothDevice mmDevice;
 
     private static final UUID MY_UUID = UUID.fromString("000011008-0000-1000-8000-00805F9B34FB");
+    private final Handler mHandler;
 
-    public ConnectThread(BluetoothDevice device) {
+    public ConnectThread(Handler handler, BluetoothDevice device) {
         // Use a temporary object that is later assigned to mmSocket,
         // because mmSocket is final
         BluetoothSocket tmp = null;
         mmDevice = device;
+        mHandler = handler;
 
         // Get a BluetoothSocket to connect with the given BluetoothDevice
         try {
@@ -37,6 +40,10 @@ public class ConnectThread extends Thread {
             // until it succeeds or throws an exception
             mmSocket.connect();
             // Do work to manage the connection (in a separate thread)
+
+            ConnectedThread connectedThread = new ConnectedThread(mHandler, mmSocket);
+            connectedThread.start();
+
         } catch (IOException connectException) {
             // Unable to connect; close the socket and get out
             try {
@@ -46,7 +53,6 @@ public class ConnectThread extends Thread {
         }
 
 
-//        manageConnectedSocket(mmSocket);
     }
 
     /** Will cancel an in-progress connection, and close the socket */
@@ -62,7 +68,7 @@ public class ConnectThread extends Thread {
                 return false;
 
             }
-            mmSocket.getOutputStream().write((Long.toString(System.currentTimeMillis()) + " " + message).getBytes());
+            mmSocket.getOutputStream().write((message).getBytes());
             return true;
         } catch (IOException e) {
             e.printStackTrace();

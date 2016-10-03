@@ -44,13 +44,9 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if(connectThread == null) {
-                    connectThread = new ConnectThread(deviceList.get(position));
-                    connectThread.start();
-                }
-                connectThread.sendMessage("Un mesaj ratacit");
-
-
+                Intent intent = new Intent(MainActivity.this, SendMessageActivity.class);
+                intent.putExtra("device", deviceList.get(position));
+                startActivity(intent);
             }
         });
     }
@@ -69,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
         Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
 // If there are paired devices
         if (pairedDevices.size() > 0) {
+            deviceList.clear();
             // Loop through paired devices
             for (BluetoothDevice device : pairedDevices) {
                 // Add the name and address to an array adapter to show in a ListView

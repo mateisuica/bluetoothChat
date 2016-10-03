@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -26,6 +28,7 @@ public class ServerActivity extends Activity {
     private int REQUEST_ENABLE_BT = 8332;
     private AcceptThread mAcceptThread;
     private TextView view;
+    private ConnectedThread connectedThread;
 
 
     @Override
@@ -33,7 +36,20 @@ public class ServerActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.server_activity);
 
-        view = (TextView)findViewById(R.id.textView);
+        view = (TextView)findViewById(R.id.serverMessages);
+
+        final EditText text = (EditText) findViewById(R.id.serverMessage);
+        Button send = (Button) findViewById(R.id.serverSend);
+        send.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                String mesaj = mBluetoothAdapter.getName() + " " + Long.toString(System.currentTimeMillis()) + " " + text.getText().toString();
+                if (connectedThread.write(mesaj.getBytes()) ) {
+                    view.append("To: " + mesaj + "\n");
+                }
+            }
+        });
     }
 
     @Override
@@ -51,9 +67,6 @@ public class ServerActivity extends Activity {
             mAcceptThread = new AcceptThread();
             mAcceptThread.start();
         }
-
-
-
     }
 
 
@@ -103,8 +116,8 @@ public class ServerActivity extends Activity {
 
 
     public void manageConnectedSocket(BluetoothSocket socket) {
-        ConnectedThread server = new ConnectedThread(mHandler, socket);
-        server.start();
+        connectedThread = new ConnectedThread(mHandler, socket);
+        connectedThread.start();
     }
 
     private final Handler mHandler = new Handler() {
@@ -114,7 +127,7 @@ public class ServerActivity extends Activity {
                 case MESSAGE_READ:
                     byte[] readBuf = (byte[])msg.obj;
                     String readMessage = new String(readBuf, 0, msg.arg1);
-                    view.append(readMessage);
+                    view.append(readMessage + "\n");
             }
         }
     };

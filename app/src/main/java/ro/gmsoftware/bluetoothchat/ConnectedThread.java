@@ -50,11 +50,12 @@ public class ConnectedThread extends Thread {
         }
     }
 
-    public void write(byte[] bytes) {
+    public boolean write(byte[] bytes) {
         try {
             mmOutStream.write(bytes);
         }
-        catch (IOException e) { }
+        catch (IOException e) { return false; }
+        return true;
     }
 
     public void cancel() {

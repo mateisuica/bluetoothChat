@@ -17,7 +17,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ServerActivity" />
+        <activity android:name=".ServerActivity"
+            android:windowSoftInputMode="adjustResize"
+            />
+        <activity android:name=".SendMessageActivity"
+            android:windowSoftInputMode="adjustResize"
+            ></activity>
     </application>
 
 </manifest>
